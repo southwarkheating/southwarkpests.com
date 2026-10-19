@@ -4,7 +4,7 @@ var d=document;
 var CFG={
  api:'https://ylyasshhvuhhpmpotera.supabase.co/functions/v1/boiler-sites-gateway',
  price:90,          /* standard visit price shown on the booking form, in pounds */
- stripe:'',         /* paste your Stripe Payment Link here to send customers to pay after booking; leave empty to just confirm */
+ stripe:'https://buy.stripe.com/00wcN6cpY3iVeR420Cc3m06', /* Southwark Heating £90 pest control Stripe Payment Link */
  phone:'020 8050 2022',
  mobile:'07988 991963'
 };
@@ -54,6 +54,7 @@ if(bad.length){setMsg(m,'err','Please add '+bad.join(', ')+'.');return}
 var id=uuid();btn.disabled=true;setMsg(m,'','Booking...');
 post(CFG.api+'?to=intake',{booking_id:id,service_key:'pest',name:name,email:email,phone:phone,address:addr,postcode:pc,price:CFG.price,preferred_date:date||null,preferred_time:time,message:'Pest: '+pest+(msg?'\n'+msg:''),_gotcha:val(bf,'_gotcha')})
 .then(function(){
+ post(CFG.api+'?to=notify',{booking_id:id}).catch(function(){}); /* alert in the app */
  if(CFG.stripe){setMsg(m,'ok','Booking received. Taking you to secure payment...');location.href=CFG.stripe+(CFG.stripe.indexOf('?')>-1?'&':'?')+'client_reference_id=bk_'+id+'&prefilled_email='+encodeURIComponent(email)}
  else{bf.reset();setMsg(m,'ok','Thanks, '+name.split(' ')[0]+'. Your booking request is in and we will confirm your date and time by phone or email.');btn.disabled=false}})
 .catch(function(){setMsg(m,'err','That did not send and nothing has been charged. Please call '+CFG.phone+' or '+CFG.mobile+'.');btn.disabled=false})})}
